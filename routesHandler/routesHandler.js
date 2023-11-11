@@ -44,4 +44,22 @@ router.get("/singleUser/:email", async (req, res) => {
     );
 });
 
+//update user (by user)
+router.put("/updateUser/:email", async (req, res) => {
+  const userEmail = req.params.email;
+  const { name, photoURL } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email: userEmail });
+
+    if (!existingUser) {
+      return res.status(401).json({ message: "User not found" });
+    }
+    await User.updateOne({ email: userEmail }, { $set: { name, photoURL } });
+    res.status(201).json({ message: "User updated successfully" });
+  } catch (error) {
+    res.status(401).json({ message: "Something went wrong" });
+  }
+});
+
 module.exports = router;
