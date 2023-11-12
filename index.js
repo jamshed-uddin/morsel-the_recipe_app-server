@@ -3,7 +3,8 @@ const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const routesHandler = require("./routesHandler/routesHandler");
+const userRoutesHandler = require("./routesHandler/userRoutesHandler");
+const recipeRoutesHandler = require("./routesHandler/recipeRoutesHandler");
 
 const port = process.env.PORT || 3000;
 
@@ -19,7 +20,8 @@ try {
   console.log(error);
 }
 
-app.use("/morsel", routesHandler);
+app.use("/morsel", userRoutesHandler);
+app.use("/morsel", recipeRoutesHandler);
 
 app.get("/", (req, res) => {
   res.send("morsel server is on");

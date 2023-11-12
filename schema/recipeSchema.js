@@ -15,7 +15,7 @@ const recipeSchema = mongoose.Schema({
   status: { type: String, default: "pending" },
   likedBy: [],
   savedBy: [],
-  createdAt: { type: Date, default: () => Date.now.toString() },
+  createdAt: { type: Date, default: () => Date.now() },
 });
 
 module.exports = mongoose.model("recipe", recipeSchema);

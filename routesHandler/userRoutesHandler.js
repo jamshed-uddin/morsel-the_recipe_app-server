@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const User = require("../schema/userSchema");
 
 //create a user
@@ -10,7 +9,7 @@ router.post("/newUser", async (req, res) => {
   if (existingUser) {
     return res
       .status(401)
-      .json({ message: "User with this email already exists" });
+      .json({ error: "User with this email already exists" });
   }
 
   const newUser = new User(req.body);
@@ -39,9 +38,7 @@ router.get("/singleUser/:email", async (req, res) => {
   const userEmail = req.params.email;
   await User.findOne({ email: userEmail })
     .then((result) => res.status(201).json(result))
-    .catch((error) =>
-      res.status(401).json({ message: "Something went wrong" })
-    );
+    .catch((error) => res.status(401).json({ error: "Something went wrong" }));
 });
 
 //update user (by user)
@@ -53,17 +50,17 @@ router.put("/updateUser/:email", async (req, res) => {
     const existingUser = await User.findOne({ email: userEmail });
 
     if (!existingUser) {
-      return res.status(401).json({ message: "User not found" });
+      return res.status(401).json({ error: "User not found" });
     }
     await User.updateOne({ email: userEmail }, { $set: { name, photoURL } });
     res.status(201).json({ message: "User updated successfully" });
   } catch (error) {
-    res.status(401).json({ message: "Something went wrong" });
+    res.status(401).json({ error: "Something went wrong" });
   }
 });
 
 //update user role(by admin)
-//we will check first if the current user is admin.if the user is admin only then the updating block work.
+//we will check first if the current user is admin.if the user is admin only then the updating block will work.
 
 router.patch("/updateRole/:adminEmail", async (req, res) => {
   const adminEmail = req.params.adminEmail;
@@ -72,12 +69,12 @@ router.patch("/updateRole/:adminEmail", async (req, res) => {
     const currentUser = await User.findOne({ email: adminEmail });
 
     if (currentUser.role !== "admin") {
-      return res.status(401).json({ message: "Unauthorized actions" });
+      return res.status(401).json({ error: "Unauthorized actions" });
     }
     await User.updateOne({ email: userEmail }, { $set: { role } });
     res.status(201).json({ message: "User role changed" });
   } catch (error) {
-    res.status(401).json({ message: "Something went wrong" });
+    res.status(401).json({ error: "Something went wrong" });
   }
 });
 
