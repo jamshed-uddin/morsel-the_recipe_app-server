@@ -62,4 +62,23 @@ router.put("/updateUser/:email", async (req, res) => {
   }
 });
 
+//update user role(by admin)
+//we will check first if the current user is admin.if the user is admin only then the updating block work.
+
+router.patch("/updateRole/:adminEmail", async (req, res) => {
+  const adminEmail = req.params.adminEmail;
+  const { role, userEmail } = req.body;
+  try {
+    const currentUser = await User.findOne({ email: adminEmail });
+
+    if (currentUser.role !== "admin") {
+      return res.status(401).json({ message: "Unauthorized actions" });
+    }
+    await User.updateOne({ email: userEmail }, { $set: { role } });
+    res.status(201).json({ message: "User role changed" });
+  } catch (error) {
+    res.status(401).json({ message: "Something went wrong" });
+  }
+});
+
 module.exports = router;
