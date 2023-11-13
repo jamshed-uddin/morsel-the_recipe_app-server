@@ -17,9 +17,9 @@ const recipeSchema = mongoose.Schema({
   cookTime: { hours: Number, minutes: Number },
   tags: [],
   status: { type: String, default: "pending" },
-  likedBy: [],
-  savedBy: [],
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: () => Date.now() },
 });
 
-module.exports = mongoose.model("recipe", recipeSchema);
+module.exports = mongoose.model("Recipe", recipeSchema);
