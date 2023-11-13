@@ -2,8 +2,12 @@ const mongoose = require("mongoose");
 
 const recipeSchema = mongoose.Schema({
   recipeName: { type: String, required: true },
-  creatorName: String,
-  creatorId: String,
+  creatorInfo: {
+    creatorName: String,
+    creatorId: String,
+    creatorEmail: String,
+    creatorPhoto: String,
+  },
   recipeImages: [],
   description: String,
   ingredients: { type: Array, required: true },
