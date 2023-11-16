@@ -60,7 +60,7 @@ router.post("/saveNewItem/:itemId", async (req, res) => {
   }
 });
 
-// savedBy length
+// how many times the item saved
 router.get("/savedByLength/:itemId", async (req, res) => {
   const itemId = req.params.itemId;
   // itemId here is the original item(recipe/blog) id that has in their own collection
