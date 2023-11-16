@@ -7,6 +7,8 @@ router.get("/savedItem", async (req, res) => {
   const userId = req.query.userId;
   const itemType = req.query.itemType;
 
+  //item type for filtering item with Recipe/Blog/All
+
   try {
     if (itemType === "All") {
       const savedItems = await SavedItem.find({ userId }).populate({
@@ -35,13 +37,13 @@ router.post("/saveNewItem/:itemId", async (req, res) => {
   const { userId, userEmail, itemType } = req.body;
 
   try {
-    const userSpecificItem = await SavedItem.find({
-      $and: [{ userEmail }, { itemId }],
-    });
-    if (userSpecificItem) {
-      return res.status(401).json({ error: "Item already saved" });
+    // checking if the same user trying to save a item twice.
+    const isItemExisting = await SavedItem.findOne({ userEmail, item: itemId });
+    if (isItemExisting) {
+      return res.status(401).json({ error: `${itemType} already selected` });
     }
 
+    // if the item user saving is unique to the user's savedItem collection
     const savedItem = new SavedItem({
       userId: new mongoose.Types.ObjectId(userId),
       item: new mongoose.Types.ObjectId(itemId),
@@ -52,8 +54,22 @@ router.post("/saveNewItem/:itemId", async (req, res) => {
 
     res.status(201).json({ message: "Item saved successfully" });
   } catch (error) {
-    console.log(error);
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
+//delete saved item
+router.delete("/deleteSavedItem/:itemId", async (req, res) => {
+  try {
+    await SavedItem.deleteOne({ _id: req.params.itemId });
+
+    res.status(201).json({ message: "Deleted successfully" });
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 
