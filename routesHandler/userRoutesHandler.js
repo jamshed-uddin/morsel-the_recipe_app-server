@@ -5,40 +5,50 @@ const User = require("../schema/userSchema");
 //create a user
 router.post("/newUser", async (req, res) => {
   const { email } = req.body;
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res
+  try {
+    //checking if user with same email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(401)
+        .json({ error: "User with this email already exists" });
+    }
+
+    // if not create a new user
+    const newUser = new User(req.body);
+    await newUser.save();
+    res.status(200).json({ message: "User registered successfully" });
+  } catch (error) {
+    res
       .status(401)
-      .json({ error: "User with this email already exists" });
+      .json({ error: "Something went wrong", message: error.message });
   }
-
-  const newUser = new User(req.body);
-
-  await newUser
-    .save()
-    .then(() => {
-      res.status(200).json({ message: "User registered successfully" });
-    })
-    .catch((error) => {
-      console.log(error);
-
-      res.status(401).json({ error: "Something went wrong" });
-    });
 });
 
 //get all users
 router.get("/users", async (req, res) => {
-  await User.find()
-    .then((result) => res.status(201).json(result))
-    .catch((error) => res.status(401).json({ error: "Something went wrong" }));
+  try {
+    const result = await User.find();
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
 });
 
 //get a single user
 router.get("/singleUser/:email", async (req, res) => {
   const userEmail = req.params.email;
-  await User.findOne({ email: userEmail })
-    .then((result) => res.status(201).json(result))
-    .catch((error) => res.status(401).json({ error: "Something went wrong" }));
+
+  try {
+    const result = await User.findOne({ email: userEmail });
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
 });
 
 //update user (by user)
@@ -55,7 +65,9 @@ router.put("/updateUser/:email", async (req, res) => {
     await User.updateOne({ email: userEmail }, { $set: { name, photoURL } });
     res.status(201).json({ message: "User updated successfully" });
   } catch (error) {
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 
@@ -69,12 +81,35 @@ router.patch("/updateRole/:adminEmail", async (req, res) => {
     const currentUser = await User.findOne({ email: adminEmail });
 
     if (currentUser.role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized actions" });
+      return res.status(401).json({ error: "Unauthorized action" });
     }
     await User.updateOne({ email: userEmail }, { $set: { role } });
     res.status(201).json({ message: "User role changed" });
   } catch (error) {
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
+// deleting user (only admin action )
+router.delete("/deleteUser", async (req, res) => {
+  const adminEmail = req.query.adminEmail;
+  const deletingUserId = req.query.userId;
+
+  try {
+    const currentUser = await User.findOne({ email: adminEmail });
+
+    if (currentUser.role !== "admin") {
+      return res.status(401).json({ error: "Unauthorized action" });
+    }
+
+    await User.deleteOne({ _id: deletingUserId });
+    res.status(201).json({ message: "User deleted successfully" });
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 
