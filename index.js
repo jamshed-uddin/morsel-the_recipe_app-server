@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const userRoutesHandler = require("./routesHandler/userRoutesHandler");
 const recipeRoutesHandler = require("./routesHandler/recipeRoutesHandler");
+const blogRoutesHandler = require("./routesHandler/blogRoutesHandler");
+const savedItemRoutesHandler = require("./routesHandler/savedItemRoutesHanlder");
 
 const port = process.env.PORT || 3000;
 
@@ -22,6 +24,8 @@ try {
 
 app.use("/morsel", userRoutesHandler);
 app.use("/morsel", recipeRoutesHandler);
+app.use("/morsel", blogRoutesHandler);
+app.use("/morsel", savedItemRoutesHandler);
 
 app.get("/", (req, res) => {
   res.send("morsel server is on");

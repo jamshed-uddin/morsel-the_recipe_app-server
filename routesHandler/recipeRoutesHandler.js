@@ -79,7 +79,7 @@ router.put("updateRecipe/:userEmail", async (req, res) => {
   }
 });
 
-//update liked by
+//update liked by for both blog and recipe
 router.patch("/changeReaction/:id", async (req, res) => {
   const id = req.params.id; //this id may come from recipe or blog
   const { userId, action, actionFrom } = req.body;
@@ -107,7 +107,6 @@ router.patch("/changeReaction/:id", async (req, res) => {
 
         return res.status(201).json({ message: "Disliked successfully" });
       }
-      return;
     }
 
     //if action from blog
@@ -132,7 +131,6 @@ router.patch("/changeReaction/:id", async (req, res) => {
 
         return res.status(201).json({ message: "Disliked successfully" });
       }
-      return;
     }
   } catch (error) {
     res.status(401).json({ error: "Something went wrong" });
