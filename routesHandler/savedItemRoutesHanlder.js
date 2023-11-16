@@ -35,7 +35,7 @@ router.get("/savedItem", async (req, res) => {
 router.post("/saveNewItem/:itemId", async (req, res) => {
   const itemId = req.params.itemId;
   const { userId, userEmail, itemType } = req.body;
-
+  // itemId here is the original item(recipe/blog) id that has in their own collection
   try {
     // checking if the same user trying to save a item twice.
     const isItemExisting = await SavedItem.findOne({ userEmail, item: itemId });
@@ -53,6 +53,23 @@ router.post("/saveNewItem/:itemId", async (req, res) => {
     await savedItem.save();
 
     res.status(201).json({ message: "Item saved successfully" });
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
+// savedBy length
+router.get("/savedByLength/:itemId", async (req, res) => {
+  const itemId = req.params.itemId;
+  // itemId here is the original item(recipe/blog) id that has in their own collection
+
+  try {
+    const savedItems = await SavedItem.find({ item: itemId });
+    const savedItemsLength = savedItems.length;
+
+    res.status(201).json({ timesSaved: parseInt(savedItemsLength) });
   } catch (error) {
     res
       .status(401)
