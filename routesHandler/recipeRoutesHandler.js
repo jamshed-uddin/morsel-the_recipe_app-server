@@ -11,24 +11,36 @@ router.post("/createRecipe", async (req, res) => {
     await newRecipe.save();
     res.status(201).json({ message: "Recipe created successfully" });
   } catch (error) {
-    console.log(error);
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 
 //get all recipes
 router.get("/recipes", async (req, res) => {
-  await Recipe.find()
-    .then((result) => res.status(201).json(result))
-    .catch((error) => res.status(401).json({ error: "Something went wrong" }));
+  try {
+    await Recipe.find();
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
 });
 
 //get a single recipe
 router.get("/singleRecipe/:recipeId", async (req, res) => {
   const recipeId = req.params.recipeId;
-  await Recipe.findOne({ _id: recipeId })
-    .then((result) => res.status(201).json(result))
-    .catch((error) => res.status(401).json({ error: "Something went wrong" }));
+
+  try {
+    await Recipe.findOne({ _id: recipeId });
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
 });
 
 // update status (by admin)
@@ -45,7 +57,9 @@ router.patch("/updateStatus/:adminEmail", async (req, res) => {
     await Recipe.updateOne({ _id: recipeId }, { $set: { status } });
     res.status(201).json({ message: "Recipe status changed successfully" });
   } catch (error) {
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 
@@ -73,9 +87,11 @@ router.put("updateRecipe/:userEmail", async (req, res) => {
     if (!updatedRecipe) {
       return res.status(404).json({ error: "Recipe not found" });
     }
-    res.status(201).json(updatedRecipe);
+    res.status(201).json({ message: "Updated Successfully", updatedRecipe });
   } catch (error) {
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 
