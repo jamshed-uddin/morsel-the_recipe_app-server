@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Recipe = require("../schema/recipeSchema");
 const Blog = require("../schema/blogSchema");
+const SavedItem = require("../schema/savedItemSchema");
 
 //update liked by for both blog and recipe
 router.patch("/changeReaction/:id", async (req, res) => {
@@ -57,7 +58,53 @@ router.patch("/changeReaction/:id", async (req, res) => {
       }
     }
   } catch (error) {
-    res.status(401).json({ error: "Something went wrong" });
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
+router.get("/isLikedAndSaved", async (req, res) => {
+  const userEmail = req.query.userEmail;
+  const itemId = req.query.itemId;
+  const itemType = req.query.itemType;
+
+  try {
+    const isItemExisting = await SavedItem.findOne({ userEmail, item: itemId });
+    const isSaved = isItemExisting !== null;
+    console.log(isItemExisting);
+
+    if (itemType === "recipe") {
+      const item = await Recipe.findOne({ _id: itemId }).populate({
+        path: "likedBy",
+        select: "_id email ",
+      });
+      console.log(item);
+      const userExistsInLikedBy = item.likedBy.find(
+        (obj) => obj.email === userEmail
+      );
+      console.log("85", userExistsInLikedBy);
+      const isLiked = userExistsInLikedBy !== undefined;
+
+      return res.status(201).json({ isSaved, isLiked });
+    } else {
+      const item = await Blog.findOne({ _id: itemId }).populate({
+        path: "likedBy",
+        select: "_id email ",
+      });
+
+      const userExistsInLikedBy = item.likedBy.find(
+        (obj) => obj.email === userEmail
+      );
+      const isLiked =
+        userExistsInLikedBy !== null || userExistsInLikedBy !== undefined;
+
+      return res.status(201).json({ isSaved, isLiked });
+    }
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
   }
 });
 

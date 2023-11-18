@@ -10,8 +10,7 @@ const blogSchema = mongoose.Schema({
   },
   blogBody: { type: String, required: true },
   status: { type: String, default: "pending" },
-  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, refPath: "User" }],
   createdAt: { type: Date, default: () => Date.now() },
 });
 

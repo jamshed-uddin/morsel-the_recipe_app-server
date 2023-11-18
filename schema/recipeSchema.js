@@ -18,7 +18,6 @@ const recipeSchema = mongoose.Schema({
   tags: [],
   status: { type: String, default: "pending" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: () => Date.now() },
 });
 
