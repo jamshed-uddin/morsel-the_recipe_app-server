@@ -95,4 +95,16 @@ router.put("updateRecipe/:userEmail", async (req, res) => {
   }
 });
 
+router.delete("/deleteRecipe/:id", async (req, res) => {
+  const deletingRecipeId = req.params.id;
+  try {
+    await Recipe.deleteOne({ _id: deletingRecipeId });
+    res.status(201).json({ message: "Recipe deleted successfully" });
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
 module.exports = router;

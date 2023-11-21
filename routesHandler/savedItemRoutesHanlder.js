@@ -13,7 +13,8 @@ router.get("/savedItem", async (req, res) => {
     if (itemType === "All") {
       const savedItems = await SavedItem.find({ userId }).populate({
         path: "item",
-        select: "recipeName recipeImages ingredients prepTime ",
+        select:
+          "title creatorInfo recipeName recipeImages ingredients prepTime ",
       });
       return res.status(201).json(savedItems);
     }
@@ -22,7 +23,7 @@ router.get("/savedItem", async (req, res) => {
       $and: [{ userId }, { itemType }],
     }).populate({
       path: "item",
-      select: "recipeName recipeImages ingredients prepTime",
+      select: "title creatorInfo recipeName recipeImages ingredients prepTime",
     });
     // const populatedItem = savedItem.populate("item");
     res.status(201).json(savedItems);
@@ -52,7 +53,7 @@ router.post("/saveNewItem/:itemId", async (req, res) => {
     });
     await savedItem.save();
 
-    res.status(201).json({ message: "Item saved successfully" });
+    res.status(201).json({ message: `${itemType} saved successfully` });
   } catch (error) {
     res
       .status(401)

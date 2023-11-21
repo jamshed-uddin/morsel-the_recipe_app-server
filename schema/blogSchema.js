@@ -8,9 +8,11 @@ const blogSchema = mongoose.Schema({
     creatorEmail: String,
     creatorPhoto: String,
   },
+  previewImages: [],
   blogBody: { type: String, required: true },
   status: { type: String, default: "pending" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, refPath: "User" }],
+  tags: [],
   createdAt: { type: Date, default: () => Date.now() },
 });
 
