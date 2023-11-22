@@ -8,7 +8,7 @@ const blogSchema = mongoose.Schema({
     creatorEmail: String,
     creatorPhoto: String,
   },
-  previewImages: [],
+  previewImage: { type: String },
   blogBody: { type: String, required: true },
   status: { type: String, default: "pending" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, refPath: "User" }],

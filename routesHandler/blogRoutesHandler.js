@@ -19,7 +19,7 @@ router.post("/createBlog", async (req, res) => {
 //get all blog
 router.get("/allBlogs", async (req, res) => {
   try {
-    await Blog.find();
+    const result = await Blog.find({}, "title previewImage");
     res.status(201).json(result);
   } catch (error) {
     res

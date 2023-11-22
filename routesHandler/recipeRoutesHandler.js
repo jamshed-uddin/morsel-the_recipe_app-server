@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Recipe = require("../schema/recipeSchema");
-const Blog = require("../schema/blogSchema");
 const User = require("../schema/userSchema");
 
 //post a recipe
@@ -18,10 +17,14 @@ router.post("/createRecipe", async (req, res) => {
 });
 
 //get all recipes
-router.get("/recipes", async (req, res) => {
+router.get("/allRecipes", async (req, res) => {
   try {
-    await Recipe.find();
+    const result = await Recipe.find(
+      {},
+      "recipeName recipeImages  ingredients prepTime"
+    );
     res.status(201).json(result);
+    console.log(result);
   } catch (error) {
     res
       .status(401)
