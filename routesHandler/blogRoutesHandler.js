@@ -7,8 +7,11 @@ const User = require("../schema/userSchema");
 router.post("/createBlog", async (req, res) => {
   try {
     const newBlog = new Blog(req.body);
-    await newBlog.save();
-    res.status(201).json({ message: "Blog created successfully" });
+    const savedBlog = await newBlog.save();
+    res.status(201).json({
+      message: "Blog created successfully",
+      savedBlogId: savedBlog._id,
+    });
   } catch (error) {
     res
       .status(401)
@@ -82,7 +85,12 @@ router.put("updateBlog/:userEmail", async (req, res) => {
     if (!updatedBlog) {
       return res.status(404).json({ error: "Blog not found" });
     }
-    res.status(201).json({ message: "Updated Successfully", updatedBlog });
+    res
+      .status(201)
+      .json({
+        message: "Updated Successfully",
+        updatedBlogId: updatedBlog._id,
+      });
   } catch (error) {
     res
       .status(401)
