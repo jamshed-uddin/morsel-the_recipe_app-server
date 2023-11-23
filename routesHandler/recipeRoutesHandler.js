@@ -7,8 +7,11 @@ const User = require("../schema/userSchema");
 router.post("/createRecipe", async (req, res) => {
   try {
     const newRecipe = new Recipe(req.body);
-    await newRecipe.save();
-    res.status(201).json({ message: "Recipe created successfully" });
+    const savedRecipe = await newRecipe.save();
+    res.status(201).json({
+      message: "Recipe created successfully",
+      savedRecipeId: savedRecipe._id,
+    });
   } catch (error) {
     res
       .status(401)
@@ -24,7 +27,6 @@ router.get("/allRecipes", async (req, res) => {
       "recipeName recipeImages  ingredients prepTime"
     );
     res.status(201).json(result);
-    console.log(result);
   } catch (error) {
     res
       .status(401)
@@ -37,7 +39,9 @@ router.get("/singleRecipe/:recipeId", async (req, res) => {
   const recipeId = req.params.recipeId;
 
   try {
-    await Recipe.findOne({ _id: recipeId });
+    const result = await Recipe.findOne({ _id: recipeId }).populate(
+      "creatorInfo"
+    );
     res.status(201).json(result);
   } catch (error) {
     res
@@ -90,7 +94,12 @@ router.put("updateRecipe/:userEmail", async (req, res) => {
     if (!updatedRecipe) {
       return res.status(404).json({ error: "Recipe not found" });
     }
-    res.status(201).json({ message: "Updated Successfully", updatedRecipe });
+    res
+      .status(201)
+      .json({
+        message: "Updated Successfully",
+        updatedRecipeId: updatedRecipe._id,
+      });
   } catch (error) {
     res
       .status(401)

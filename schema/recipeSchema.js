@@ -2,12 +2,7 @@ const mongoose = require("mongoose");
 
 const recipeSchema = mongoose.Schema({
   recipeName: { type: String, required: true },
-  creatorInfo: {
-    creatorName: String,
-    creatorId: String,
-    creatorEmail: String,
-    creatorPhoto: String,
-  },
+  creatorInfo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   recipeImages: [],
   description: String,
   ingredients: { type: Array, required: true },

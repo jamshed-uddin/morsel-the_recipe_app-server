@@ -29,11 +29,11 @@ router.get("/allBlogs", async (req, res) => {
 });
 
 //get a single blog
-router.get("/singleRecipe/:blogId", async (req, res) => {
+router.get("/singleBlog/:blogId", async (req, res) => {
   const blogId = req.params.blogId;
 
   try {
-    await Blog.findOne({ _id: blogId });
+    const result = await Blog.findOne({ _id: blogId }).populate("creatorInfo");
     res.status(201).json(result);
   } catch (error) {
     res
