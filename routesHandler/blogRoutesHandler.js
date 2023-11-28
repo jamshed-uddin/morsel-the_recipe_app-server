@@ -10,7 +10,7 @@ router.post("/createBlog", async (req, res) => {
     const savedBlog = await newBlog.save();
     res.status(201).json({
       message: "Blog created successfully",
-      savedBlogId: savedBlog._id,
+      id: savedBlog._id,
     });
   } catch (error) {
     res
@@ -85,12 +85,10 @@ router.put("updateBlog/:userEmail", async (req, res) => {
     if (!updatedBlog) {
       return res.status(404).json({ error: "Blog not found" });
     }
-    res
-      .status(201)
-      .json({
-        message: "Updated Successfully",
-        updatedBlogId: updatedBlog._id,
-      });
+    res.status(201).json({
+      message: "Updated Successfully",
+      id: updatedBlog._id,
+    });
   } catch (error) {
     res
       .status(401)

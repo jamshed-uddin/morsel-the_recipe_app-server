@@ -10,7 +10,7 @@ router.post("/createRecipe", async (req, res) => {
     const savedRecipe = await newRecipe.save();
     res.status(201).json({
       message: "Recipe created successfully",
-      savedRecipeId: savedRecipe._id,
+      id: savedRecipe._id,
     });
   } catch (error) {
     res
@@ -94,12 +94,10 @@ router.put("updateRecipe/:userEmail", async (req, res) => {
     if (!updatedRecipe) {
       return res.status(404).json({ error: "Recipe not found" });
     }
-    res
-      .status(201)
-      .json({
-        message: "Updated Successfully",
-        updatedRecipeId: updatedRecipe._id,
-      });
+    res.status(201).json({
+      message: "Updated Successfully",
+      id: updatedRecipe._id,
+    });
   } catch (error) {
     res
       .status(401)
