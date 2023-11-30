@@ -35,7 +35,9 @@ router.get("/savedItem", async (req, res) => {
 
 router.post("/saveNewItem/:itemId", async (req, res) => {
   const itemId = req.params.itemId;
+  //itemType first letter must ne in capital(Recipe/Blog).cause it's given as refPath in schema to populate with entire blog/recipe data
   const { userId, userEmail, itemType } = req.body;
+  console.log(req.body);
   // itemId here is the original item(recipe/blog) id that has in their own collection
   try {
     // checking if the same user trying to save a item twice.
@@ -79,9 +81,12 @@ router.get("/savedByLength/:itemId", async (req, res) => {
 });
 
 //delete saved item
-router.delete("/deleteSavedItem/:itemId", async (req, res) => {
+router.delete("/deleteSavedItem", async (req, res) => {
   try {
-    await SavedItem.deleteOne({ _id: req.params.itemId });
+    await SavedItem.deleteOne({
+      item: req.query.itemId,
+      userEmail: req.query.userEmail,
+    });
 
     res.status(201).json({ message: "Deleted successfully" });
   } catch (error) {

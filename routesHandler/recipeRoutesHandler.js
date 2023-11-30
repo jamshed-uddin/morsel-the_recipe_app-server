@@ -105,9 +105,23 @@ router.put("updateRecipe/:userEmail", async (req, res) => {
   }
 });
 
-router.delete("/deleteRecipe/:id", async (req, res) => {
-  const deletingRecipeId = req.params.id;
+router.delete("/deleteRecipe", async (req, res) => {
+  const deletingRecipeId = req.query.itemId;
+  const currentUserEmail = req.query.userEmail;
   try {
+    const deletingItem = await Recipe.findOne({
+      _id: deletingRecipeId,
+    }).populate("creatorInfo");
+
+    if (deletingItem.creatorInfo.email !== currentUserEmail) {
+      return res.status(401).json({ error: "Unauthorized action" });
+    }
+
+    await SavedItem.deleteOne({
+      userEmail: currentUserEmail,
+      item: deletingBlogId,
+    });
+
     await Recipe.deleteOne({ _id: deletingRecipeId });
     res.status(201).json({ message: "Recipe deleted successfully" });
   } catch (error) {

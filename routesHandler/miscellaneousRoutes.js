@@ -72,22 +72,23 @@ router.get("/isLikedAndSaved", async (req, res) => {
   try {
     const isItemExisting = await SavedItem.findOne({ userEmail, item: itemId });
     const isSaved = isItemExisting !== null;
-    console.log(isItemExisting);
 
     if (itemType === "recipe") {
       const item = await Recipe.findOne({ _id: itemId }).populate({
         path: "likedBy",
         select: "_id email ",
       });
-      console.log(item);
+
       const userExistsInLikedBy = item.likedBy.find(
         (obj) => obj.email === userEmail
       );
-      console.log("85", userExistsInLikedBy);
+
       const isLiked = userExistsInLikedBy !== undefined;
 
       return res.status(201).json({ isSaved, isLiked });
-    } else {
+    }
+
+    if (itemType === "blog") {
       const item = await Blog.findOne({ _id: itemId }).populate({
         path: "likedBy",
         select: "_id email ",
@@ -96,9 +97,9 @@ router.get("/isLikedAndSaved", async (req, res) => {
       const userExistsInLikedBy = item.likedBy.find(
         (obj) => obj.email === userEmail
       );
-      const isLiked =
-        userExistsInLikedBy !== null || userExistsInLikedBy !== undefined;
 
+      const isLiked = userExistsInLikedBy !== undefined;
+      console.log(isLiked);
       return res.status(201).json({ isSaved, isLiked });
     }
   } catch (error) {

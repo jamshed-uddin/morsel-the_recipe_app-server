@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Blog = require("../schema/blogSchema");
 const User = require("../schema/userSchema");
+const SavedItem = require("../schema/savedItemSchema");
 
 //post/create a blog
 router.post("/createBlog", async (req, res) => {
@@ -96,9 +97,22 @@ router.put("updateBlog/:userEmail", async (req, res) => {
   }
 });
 
-router.delete("/deleteBlog/:id", async (req, res) => {
-  const deletingBlogId = req.params.id;
+router.delete("/deleteBlog", async (req, res) => {
+  const deletingBlogId = req.query.itemId;
+  const currentUserEmail = req.query.userEmail;
   try {
+    const deletingItem = await Blog.findOne({ _id: deletingBlogId }).populate(
+      "creatorInfo"
+    );
+
+    if (deletingItem.creatorInfo.email !== currentUserEmail) {
+      return res.status(401).json({ error: "Unauthorized action" });
+    }
+
+    await SavedItem.deleteOne({
+      userEmail: currentUserEmail,
+      item: deletingBlogId,
+    });
     await Blog.deleteOne({ _id: deletingBlogId });
     res.status(201).json({ message: "Blog deleted successfully" });
   } catch (error) {
