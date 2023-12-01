@@ -32,6 +32,21 @@ router.get("/allBlogs", async (req, res) => {
   }
 });
 
+router.get("/myBlogs", async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const result = await Blog.find(
+      { creatorInfo: userId },
+      "title previewImage"
+    );
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
 //get a single blog
 router.get("/singleBlog/:blogId", async (req, res) => {
   const blogId = req.params.blogId;

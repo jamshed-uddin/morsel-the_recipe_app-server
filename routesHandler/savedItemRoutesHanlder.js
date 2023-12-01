@@ -3,7 +3,7 @@ const router = express.Router();
 const SavedItem = require("../schema/savedItemSchema");
 const mongoose = require("mongoose");
 
-router.get("/savedItem", async (req, res) => {
+router.get("/savedItems", async (req, res) => {
   const userId = req.query.userId;
   const itemType = req.query.itemType;
 
@@ -14,7 +14,7 @@ router.get("/savedItem", async (req, res) => {
       const savedItems = await SavedItem.find({ userId }).populate({
         path: "item",
         select:
-          "title creatorInfo recipeName recipeImages ingredients prepTime ",
+          "title previewImage creatorInfo recipeName recipeImages ingredients prepTime ",
       });
       return res.status(201).json(savedItems);
     }
@@ -23,7 +23,8 @@ router.get("/savedItem", async (req, res) => {
       $and: [{ userId }, { itemType }],
     }).populate({
       path: "item",
-      select: "title creatorInfo recipeName recipeImages ingredients prepTime",
+      select:
+        "title previewImage creatorInfo recipeName recipeImages ingredients prepTime",
     });
     // const populatedItem = savedItem.populate("item");
     res.status(201).json(savedItems);

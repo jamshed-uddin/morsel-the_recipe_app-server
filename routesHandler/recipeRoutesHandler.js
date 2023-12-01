@@ -34,6 +34,22 @@ router.get("/allRecipes", async (req, res) => {
   }
 });
 
+// userSpecific recipes
+router.get("/myRecipes", async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const result = await Recipe.find(
+      { creatorInfo: userId },
+      "recipeName recipeImages  ingredients prepTime"
+    );
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+
 //get a single recipe
 router.get("/singleRecipe/:recipeId", async (req, res) => {
   const recipeId = req.params.recipeId;
