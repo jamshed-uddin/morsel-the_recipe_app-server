@@ -6,6 +6,7 @@ const blogSchema = mongoose.Schema({
   previewImage: { type: String },
   blogBody: { type: String, required: true },
   status: { type: String, default: "pending" },
+  feedback: { type: String, default: "" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   tags: [],
   createdAt: { type: Date, default: () => Date.now() },

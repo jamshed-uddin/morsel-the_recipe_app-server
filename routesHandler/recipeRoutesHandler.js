@@ -24,8 +24,8 @@ router.get("/allRecipes", async (req, res) => {
   try {
     const result = await Recipe.find(
       {},
-      "recipeName recipeImages  ingredients prepTime"
-    );
+      "recipeName creatorInfo recipeImages  ingredients prepTime status"
+    ).populate("creatorInfo");
     res.status(201).json(result);
   } catch (error) {
     res
@@ -68,16 +68,16 @@ router.get("/singleRecipe/:recipeId", async (req, res) => {
 
 // update status (by admin)
 // we will check first if the the user updating the status is admin or not.
-router.patch("/updateStatus/:adminEmail", async (req, res) => {
+router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
   const adminEmail = req.params.adminEmail;
-  const { recipeId, status } = req.body;
+  const { recipeId, status, feedback } = req.body;
   try {
     const currentUser = await User.findOne({ email: adminEmail });
     if (currentUser.role !== "admin") {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    await Recipe.updateOne({ _id: recipeId }, { $set: { status } });
+    await Recipe.updateOne({ _id: recipeId }, { $set: { status, feedback } });
     res.status(201).json({ message: "Recipe status changed successfully" });
   } catch (error) {
     res

@@ -12,6 +12,7 @@ const recipeSchema = mongoose.Schema({
   cookTime: { hours: Number, minutes: Number },
   tags: [],
   status: { type: String, default: "pending" },
+  feedback: { type: String, default: "" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: () => Date.now() },
 });

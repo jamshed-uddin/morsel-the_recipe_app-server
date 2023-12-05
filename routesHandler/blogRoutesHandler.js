@@ -23,7 +23,10 @@ router.post("/createBlog", async (req, res) => {
 //get all blog
 router.get("/allBlogs", async (req, res) => {
   try {
-    const result = await Blog.find({}, "title previewImage");
+    const result = await Blog.find(
+      {},
+      "title previewImage creatorInfo, status"
+    ).populate("creatorInfo");
     res.status(201).json(result);
   } catch (error) {
     res
@@ -63,16 +66,16 @@ router.get("/singleBlog/:blogId", async (req, res) => {
 
 // update status (by admin)
 // we will check first if the the user updating the status is admin or not.
-router.patch("/updateStatus/:adminEmail", async (req, res) => {
+router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
   const adminEmail = req.params.adminEmail;
-  const { blogId, status } = req.body;
+  const { blogId, status, feedback } = req.body;
   try {
     const currentUser = await User.findOne({ email: adminEmail });
     if (currentUser.role !== "admin") {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    await Blog.updateOne({ _id: blogId }, { $set: { status } });
+    await Blog.updateOne({ _id: blogId }, { $set: { status, feedback } });
     res.status(201).json({ message: "Blog status changed successfully" });
   } catch (error) {
     res
