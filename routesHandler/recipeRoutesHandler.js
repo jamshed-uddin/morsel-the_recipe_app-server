@@ -91,6 +91,8 @@ router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
 router.put("updateRecipe/:userEmail", async (req, res) => {
   const userEmail = req.params.userEmail;
   const updatedRecipeBody = req.body;
+  console.log(updatedRecipeBody);
+
   const {
     _id,
     creatorInfo: { creatorEmail },

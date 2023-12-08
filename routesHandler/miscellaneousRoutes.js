@@ -99,7 +99,7 @@ router.get("/isLikedAndSaved", async (req, res) => {
       );
 
       const isLiked = userExistsInLikedBy !== undefined;
-      console.log(isLiked);
+
       return res.status(201).json({ isSaved, isLiked });
     }
   } catch (error) {

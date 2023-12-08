@@ -38,7 +38,7 @@ router.post("/saveNewItem/:itemId", async (req, res) => {
   const itemId = req.params.itemId;
   //itemType first letter must ne in capital(Recipe/Blog).cause it's given as refPath in schema to populate with entire blog/recipe data
   const { userId, userEmail, itemType } = req.body;
-  console.log(req.body);
+
   // itemId here is the original item(recipe/blog) id that has in their own collection
   try {
     // checking if the same user trying to save a item twice.
