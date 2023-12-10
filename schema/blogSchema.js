@@ -10,6 +10,7 @@ const blogSchema = mongoose.Schema({
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   tags: [],
   createdAt: { type: Date, default: () => Date.now() },
+  updatedAt: { type: Date },
 });
 
 module.exports = mongoose.model("Blog", blogSchema);

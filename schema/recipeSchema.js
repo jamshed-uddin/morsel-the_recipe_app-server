@@ -15,6 +15,7 @@ const recipeSchema = mongoose.Schema({
   feedback: { type: String, default: "" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: () => Date.now() },
+  updatedAt: { type: Date },
 });
 
 module.exports = mongoose.model("Recipe", recipeSchema);

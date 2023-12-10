@@ -75,7 +75,7 @@ router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    await Blog.updateOne({ _id: blogId }, { $set: { status, feedback } });
+    await Blog.updateOne({ _id: blogId }, { status, feedback });
     res.status(201).json({ message: "Blog status changed successfully" });
   } catch (error) {
     res
@@ -84,22 +84,25 @@ router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
   }
 });
 
-router.put("updateBlog/:userEmail", async (req, res) => {
+router.put("/updateBlog/:userEmail", async (req, res) => {
   const userEmail = req.params.userEmail;
   const updatedBlogBody = req.body;
-  const {
-    _id,
-    creatorInfo: { creatorEmail },
-  } = updatedBlogBody;
+  const { _id, creatorInfo } = updatedBlogBody;
 
   try {
-    if (userEmail !== creatorEmail) {
+    const creator = await User.findOne({ _id: creatorInfo });
+
+    if (userEmail !== creator.email) {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    const updatedBlog = await Blog.findOneAndUpdate({ _id }, updatedBlogBody, {
-      new: true,
-    });
+    const updatedBlog = await Blog.findOneAndUpdate(
+      { _id },
+      { ...updatedBlogBody, updatedAt: new Date().toString() },
+      {
+        new: true,
+      }
+    );
 
     if (!updatedBlog) {
       return res.status(404).json({ error: "Blog not found" });

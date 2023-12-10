@@ -77,7 +77,7 @@ router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    await Recipe.updateOne({ _id: recipeId }, { $set: { status, feedback } });
+    await Recipe.updateOne({ _id: recipeId }, { status, feedback });
     res.status(201).json({ message: "Recipe status changed successfully" });
   } catch (error) {
     res
@@ -88,24 +88,23 @@ router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
 
 //update recipe (by user/creator)
 
-router.put("updateRecipe/:userEmail", async (req, res) => {
+router.put("/updateRecipe/:userEmail", async (req, res) => {
   const userEmail = req.params.userEmail;
   const updatedRecipeBody = req.body;
   console.log(updatedRecipeBody);
 
-  const {
-    _id,
-    creatorInfo: { creatorEmail },
-  } = updatedRecipeBody;
+  const { _id, creatorInfo } = updatedRecipeBody;
 
   try {
-    if (userEmail !== creatorEmail) {
+    const creator = await User.findOne({ _id: creatorInfo });
+
+    if (userEmail !== creator.email) {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
     const updatedRecipe = await Recipe.findOneAndUpdate(
       { _id },
-      updatedRecipeBody,
+      { ...updatedRecipeBody, updatedAt: new Date().toString() },
       { new: true }
     );
 
