@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Recipe = require("../schema/recipeSchema");
 const User = require("../schema/userSchema");
+const SavedItem = require("../schema/savedItemSchema");
 
 //post a recipe
 router.post("/createRecipe", async (req, res) => {
@@ -24,6 +25,19 @@ router.get("/allRecipes", async (req, res) => {
   try {
     const result = await Recipe.find(
       {},
+      "recipeName creatorInfo recipeImages  ingredients prepTime status"
+    ).populate("creatorInfo");
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
+router.get("/allRecipes/approved", async (req, res) => {
+  try {
+    const result = await Recipe.find(
+      { status: "approved" },
       "recipeName creatorInfo recipeImages  ingredients prepTime status"
     ).populate("creatorInfo");
     res.status(201).json(result);
@@ -91,7 +105,6 @@ router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
 router.put("/updateRecipe/:userEmail", async (req, res) => {
   const userEmail = req.params.userEmail;
   const updatedRecipeBody = req.body;
-  console.log(updatedRecipeBody);
 
   const { _id, creatorInfo } = updatedRecipeBody;
 
@@ -134,9 +147,8 @@ router.delete("/deleteRecipe", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    await SavedItem.deleteOne({
-      userEmail: currentUserEmail,
-      item: deletingBlogId,
+    await SavedItem.deleteMany({
+      item: deletingRecipeId,
     });
 
     await Recipe.deleteOne({ _id: deletingRecipeId });

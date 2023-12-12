@@ -34,6 +34,19 @@ router.get("/allBlogs", async (req, res) => {
       .json({ error: "Something went wrong", message: error.message });
   }
 });
+router.get("/allBlogs/approved", async (req, res) => {
+  try {
+    const result = await Blog.find(
+      { status: "approved" },
+      "title previewImage creatorInfo, status"
+    ).populate("creatorInfo");
+    res.status(201).json(result);
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Something went wrong", message: error.message });
+  }
+});
 
 router.get("/myBlogs", async (req, res) => {
   try {
@@ -130,8 +143,7 @@ router.delete("/deleteBlog", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized action" });
     }
 
-    await SavedItem.deleteOne({
-      userEmail: currentUserEmail,
+    await SavedItem.deleteMany({
       item: deletingBlogId,
     });
     await Blog.deleteOne({ _id: deletingBlogId });
