@@ -56,7 +56,7 @@ router.get("/singleUser/:email", async (req, res) => {
 //update user (by user)
 router.put("/updateUser/:email", async (req, res) => {
   const userEmail = req.params.email;
-  const { name, photoURL } = req.body;
+  const { name, photoURL, bio } = req.body;
 
   try {
     const existingUser = await User.findOne({ email: userEmail });
@@ -64,7 +64,14 @@ router.put("/updateUser/:email", async (req, res) => {
     if (!existingUser) {
       return res.status(401).json({ error: "User not found" });
     }
-    await User.updateOne({ email: userEmail }, { $set: { name, photoURL } });
+
+    if (userEmail !== existingUser.email) {
+      return res.status(401).json({ error: "Unauthorized action" });
+    }
+    await User.updateOne(
+      { email: userEmail },
+      { $set: { name, photoURL, bio } }
+    );
     res.status(201).json({ message: "User updated successfully" });
   } catch (error) {
     res
