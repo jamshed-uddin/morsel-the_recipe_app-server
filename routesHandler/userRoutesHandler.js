@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../schema/userSchema");
+const Recipe = require("../schema/recipeSchema");
+const Blog = require("../schema/blogSchema");
+const SavedItem = require("../schema/savedItemSchema");
 
 //create a user
 router.post("/newUser", async (req, res) => {
@@ -103,19 +106,28 @@ router.patch("/updateRole/:adminEmail", async (req, res) => {
 
 // deleting user (only admin action )
 router.delete("/deleteUser", async (req, res) => {
-  const adminEmail = req.query.adminEmail;
+  const userEmail = req.query.userEmail;
   const deletingUserId = req.query.userId;
 
   try {
-    const currentUser = await User.findOne({ email: adminEmail });
+    const currentUser = await User.findOne({ email: userEmail });
 
-    if (currentUser.role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized action" });
+    if (!currentUser) {
+      return res.status(401).json({ error: "User not found" });
     }
 
+    if (currentUser.email !== userEmail) {
+      return res.status(401).json({ error: "Unauthorized action" });
+    }
+    console.log(currentUser);
     await User.deleteOne({ _id: deletingUserId });
+    await Recipe.deleteMany({ creatorInfo: deletingUserId });
+    await Blog.deleteMany({ creatorInfo: deletingUserId });
+    await SavedItem.deleteMany({ userId: deletingUserId, userEmail });
+
     res.status(201).json({ message: "User deleted successfully" });
   } catch (error) {
+    console.log(error);
     res
       .status(401)
       .json({ error: "Something went wrong", message: error.message });
