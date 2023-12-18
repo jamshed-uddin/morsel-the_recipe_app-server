@@ -78,11 +78,9 @@ router.get("/isLikedAndSaved", async (req, res) => {
         path: "likedBy",
         select: "_id email ",
       });
-
       const userExistsInLikedBy = item.likedBy.find(
         (obj) => obj.email === userEmail
       );
-
       const isLiked = userExistsInLikedBy !== undefined;
 
       return res.status(201).json({ isSaved, isLiked });

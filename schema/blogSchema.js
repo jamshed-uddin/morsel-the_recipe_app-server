@@ -5,7 +5,7 @@ const blogSchema = mongoose.Schema({
   creatorInfo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   previewImage: { type: String },
   blogBody: { type: String, required: true },
-  status: { type: String, default: "pending" },
+  status: { type: String, default: "approved" },
   feedback: { type: String, default: "" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   tags: [],

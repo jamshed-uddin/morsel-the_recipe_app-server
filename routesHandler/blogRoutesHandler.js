@@ -25,8 +25,10 @@ router.get("/allBlogs", async (req, res) => {
   try {
     const result = await Blog.find(
       {},
-      "title previewImage creatorInfo, status"
-    ).populate("creatorInfo");
+      "title previewImage creatorInfo status feedback"
+    )
+      .populate("creatorInfo")
+      .sort({ createdAt: -1 });
     res.status(201).json(result);
   } catch (error) {
     res
@@ -38,8 +40,10 @@ router.get("/allBlogs/approved", async (req, res) => {
   try {
     const result = await Blog.find(
       { status: "approved" },
-      "title previewImage creatorInfo, status"
-    ).populate("creatorInfo");
+      "title previewImage creatorInfo status feedback createdAt"
+    )
+      .populate("creatorInfo")
+      .sort({ createdAt: -1 });
     res.status(201).json(result);
   } catch (error) {
     res
@@ -53,7 +57,7 @@ router.get("/myBlogs", async (req, res) => {
     const userId = req.query.userId;
     const result = await Blog.find(
       { creatorInfo: userId },
-      "title previewImage"
+      "title previewImage status feedback"
     );
     res.status(201).json(result);
   } catch (error) {

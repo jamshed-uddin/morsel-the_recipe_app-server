@@ -25,8 +25,10 @@ router.get("/allRecipes", async (req, res) => {
   try {
     const result = await Recipe.find(
       {},
-      "recipeName creatorInfo recipeImages  ingredients prepTime status"
-    ).populate("creatorInfo");
+      "recipeName creatorInfo recipeImages  ingredients prepTime cookTime status feedback createdAt"
+    )
+      .populate("creatorInfo")
+      .sort({ createdAt: -1 });
     res.status(201).json(result);
   } catch (error) {
     res
@@ -38,8 +40,10 @@ router.get("/allRecipes/approved", async (req, res) => {
   try {
     const result = await Recipe.find(
       { status: "approved" },
-      "recipeName creatorInfo recipeImages  ingredients prepTime status"
-    ).populate("creatorInfo");
+      "recipeName creatorInfo recipeImages  ingredients prepTime cookTime status feedback createdAt"
+    )
+      .populate("creatorInfo")
+      .sort({ createdAt: -1 });
     res.status(201).json(result);
   } catch (error) {
     res
@@ -54,7 +58,7 @@ router.get("/myRecipes", async (req, res) => {
     const userId = req.query.userId;
     const result = await Recipe.find(
       { creatorInfo: userId },
-      "recipeName recipeImages  ingredients prepTime"
+      "recipeName recipeImages  ingredients prepTime cookTime status feedback"
     );
     res.status(201).json(result);
   } catch (error) {

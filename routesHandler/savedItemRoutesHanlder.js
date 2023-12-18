@@ -14,7 +14,7 @@ router.get("/savedItems", async (req, res) => {
       const savedItems = await SavedItem.find({ userId }).populate({
         path: "item",
         select:
-          "title previewImage creatorInfo recipeName recipeImages ingredients prepTime ",
+          "title previewImage creatorInfo recipeName recipeImages ingredients prepTime cookTime",
       });
       return res.status(201).json(savedItems);
     }
@@ -24,7 +24,7 @@ router.get("/savedItems", async (req, res) => {
     }).populate({
       path: "item",
       select:
-        "title previewImage creatorInfo recipeName recipeImages ingredients prepTime",
+        "title previewImage creatorInfo recipeName recipeImages ingredients prepTime cookTime",
     });
     // const populatedItem = savedItem.populate("item");
     res.status(201).json(savedItems);
