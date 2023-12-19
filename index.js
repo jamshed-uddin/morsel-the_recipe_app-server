@@ -8,6 +8,7 @@ const recipeRoutesHandler = require("./routesHandler/recipeRoutesHandler");
 const blogRoutesHandler = require("./routesHandler/blogRoutesHandler");
 const savedItemRoutesHandler = require("./routesHandler/savedItemRoutesHanlder");
 const miscellaneousRoutes = require("./routesHandler/miscellaneousRoutes");
+const { notificationRouter } = require("./routesHandler/notificationHandler");
 
 const port = process.env.PORT || 3000;
 
@@ -28,6 +29,7 @@ app.use("/morsel", recipeRoutesHandler);
 app.use("/morsel", blogRoutesHandler);
 app.use("/morsel", savedItemRoutesHandler);
 app.use("/morsel", miscellaneousRoutes);
+app.use("/morsel", notificationRouter);
 
 app.get("/", (req, res) => {
   res.send("morsel server is on");

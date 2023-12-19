@@ -3,6 +3,7 @@ const router = express.Router();
 const Blog = require("../schema/blogSchema");
 const User = require("../schema/userSchema");
 const SavedItem = require("../schema/savedItemSchema");
+const { createNotification } = require("./notificationHandler");
 
 //post/create a blog
 router.post("/createBlog", async (req, res) => {
@@ -85,7 +86,7 @@ router.get("/singleBlog/:blogId", async (req, res) => {
 // we will check first if the the user updating the status is admin or not.
 router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
   const adminEmail = req.params.adminEmail;
-  const { blogId, status, feedback } = req.body;
+  const { creatorEmail, blogId, status, feedback } = req.body;
   try {
     const currentUser = await User.findOne({ email: adminEmail });
     if (currentUser.role !== "admin") {
@@ -93,6 +94,17 @@ router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
     }
 
     await Blog.updateOne({ _id: blogId }, { status, feedback });
+
+    if (status !== "pending") {
+      const savedNotification = await createNotification(
+        creatorEmail,
+        "blog",
+        blogId,
+        `Your blog is ${status}.`
+      );
+      console.log("saved notification", savedNotification);
+    }
+
     res.status(201).json({ message: "Blog status changed successfully" });
   } catch (error) {
     res

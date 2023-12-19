@@ -3,6 +3,7 @@ const router = express.Router();
 const Recipe = require("../schema/recipeSchema");
 const User = require("../schema/userSchema");
 const SavedItem = require("../schema/savedItemSchema");
+const { createNotification } = require("./notificationHandler");
 
 //post a recipe
 router.post("/createRecipe", async (req, res) => {
@@ -88,7 +89,7 @@ router.get("/singleRecipe/:recipeId", async (req, res) => {
 // we will check first if the the user updating the status is admin or not.
 router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
   const adminEmail = req.params.adminEmail;
-  const { recipeId, status, feedback } = req.body;
+  const { creatorEmail, recipeId, status, feedback } = req.body;
   try {
     const currentUser = await User.findOne({ email: adminEmail });
     if (currentUser.role !== "admin") {
@@ -96,6 +97,16 @@ router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
     }
 
     await Recipe.updateOne({ _id: recipeId }, { status, feedback });
+
+    if (status !== "pending") {
+      const savedNotification = await createNotification(
+        creatorEmail,
+        "recipe",
+        recipeId,
+        `Your recipe is ${status}.`
+      );
+    }
+
     res.status(201).json({ message: "Recipe status changed successfully" });
   } catch (error) {
     res
