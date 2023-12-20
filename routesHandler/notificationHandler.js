@@ -62,6 +62,24 @@ notificationRouter.patch("/notificationRead/:userEmail", async (req, res) => {
   }
 });
 
+notificationRouter.delete(
+  "/deleteMyNotification/:userEmail",
+  async (req, res) => {
+    const userEmail = req.params.userEmail;
+    try {
+      await Notification.deleteMany({
+        notificationTo: userEmail,
+      });
+
+      res.status(201).json({ message: "Notifications deleted successfully" });
+    } catch (error) {
+      res
+        .status(401)
+        .json({ error: "Something went wrong", message: error.message });
+    }
+  }
+);
+
 module.exports = { createNotification, notificationRouter };
 
 // notificationTo: { type: String, required: true },

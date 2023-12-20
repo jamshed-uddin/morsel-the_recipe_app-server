@@ -100,9 +100,8 @@ router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
         creatorEmail,
         "blog",
         blogId,
-        `Your blog is ${status}.`
+        `Your blog has been ${status}.`
       );
-      console.log("saved notification", savedNotification);
     }
 
     res.status(201).json({ message: "Blog status changed successfully" });

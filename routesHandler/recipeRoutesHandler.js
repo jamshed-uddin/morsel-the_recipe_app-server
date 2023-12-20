@@ -103,7 +103,7 @@ router.patch("/updateRecipeStatus/:adminEmail", async (req, res) => {
         creatorEmail,
         "recipe",
         recipeId,
-        `Your recipe is ${status}.`
+        `Your recipe has been ${status}.`
       );
     }
 
