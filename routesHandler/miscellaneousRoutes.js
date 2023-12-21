@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const Recipe = require("../schema/recipeSchema");
 const Blog = require("../schema/blogSchema");
@@ -105,6 +106,16 @@ router.get("/isLikedAndSaved", async (req, res) => {
       .status(401)
       .json({ error: "Something went wrong", message: error.message });
   }
+});
+
+// jwt
+router.post("/jwt", async (req, res) => {
+  const email = req.body;
+  const token = jwt.sign(email, process.env.JWT_TOKEN_SECRET, {
+    expiresIn: "30d",
+  });
+
+  res.send({ token });
 });
 
 module.exports = router;

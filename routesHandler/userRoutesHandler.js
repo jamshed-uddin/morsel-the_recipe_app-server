@@ -4,6 +4,7 @@ const User = require("../schema/userSchema");
 const Recipe = require("../schema/recipeSchema");
 const Blog = require("../schema/blogSchema");
 const SavedItem = require("../schema/savedItemSchema");
+const { verifyJwt } = require("../middlewares/verifyMids");
 
 //create a user
 router.post("/newUser", async (req, res) => {
@@ -31,7 +32,7 @@ router.post("/newUser", async (req, res) => {
 });
 
 //get all users
-router.get("/users", async (req, res) => {
+router.get("/users", verifyJwt, async (req, res) => {
   try {
     const result = await User.find();
     res.status(201).json(result);

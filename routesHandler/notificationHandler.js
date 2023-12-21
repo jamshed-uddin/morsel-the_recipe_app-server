@@ -1,6 +1,7 @@
 const express = require("express");
 const notificationRouter = express.Router();
 const Notification = require("./../schema/notificationSchema");
+const errorResponse = require("../utils/errorResponse");
 
 async function createNotification(
   notificationTo,
@@ -36,13 +37,11 @@ notificationRouter.get("/myNotifications/:userEmail", async (req, res) => {
 
     res.status(201).json(myNotifications);
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
-notificationRouter.patch("/notificationRead/:userEmail", async (req, res) => {
+notificationRouter.put("/notificationRead/:userEmail", async (req, res) => {
   const userEmail = req.params.userEmail;
 
   try {
@@ -56,12 +55,11 @@ notificationRouter.patch("/notificationRead/:userEmail", async (req, res) => {
     await Notification.updateMany({ notificationTo: userEmail, read: true });
     res.status(201).json({ message: "Notifications have been read" });
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
+// delete specific users notification
 notificationRouter.delete(
   "/deleteMyNotification/:userEmail",
   async (req, res) => {
@@ -73,18 +71,9 @@ notificationRouter.delete(
 
       res.status(201).json({ message: "Notifications deleted successfully" });
     } catch (error) {
-      res
-        .status(401)
-        .json({ error: "Something went wrong", message: error.message });
+      errorResponse(res, error);
     }
   }
 );
 
 module.exports = { createNotification, notificationRouter };
-
-// notificationTo: { type: String, required: true },
-// notificationFor: { type: String },
-// itemId: { type: mongoose.Schema.Types.ObjectId },
-// text: { type: String, required: true },
-// read: { type: Boolean, default: false},
-// time: { type: Date, default: () => Date.now() },
