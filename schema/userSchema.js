@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema({
   },
   bio: { type: String, default: "" },
   role: { type: String, default: "creator" },
+  createdAt: { type: Date, default: () => Date.now() },
 });
 
 module.exports = mongoose.model("User", userSchema);

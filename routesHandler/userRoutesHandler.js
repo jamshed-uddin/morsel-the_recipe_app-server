@@ -5,6 +5,7 @@ const Recipe = require("../schema/recipeSchema");
 const Blog = require("../schema/blogSchema");
 const SavedItem = require("../schema/savedItemSchema");
 const { verifyJwt } = require("../middlewares/verifyMids");
+const errorResponse = require("../utils/errorResponse");
 
 //create a user
 router.post("/newUser", async (req, res) => {
@@ -34,7 +35,7 @@ router.post("/newUser", async (req, res) => {
 //get all users
 router.get("/users", verifyJwt, async (req, res) => {
   try {
-    const result = await User.find();
+    const result = await User.find().sort({ createdAt: -1, role: 1 });
     res.status(201).json(result);
   } catch (error) {
     res

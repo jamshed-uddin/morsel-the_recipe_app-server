@@ -26,7 +26,7 @@ router.get("/allBlogs", async (req, res) => {
   try {
     const result = await Blog.find(
       {},
-      "title previewImage creatorInfo status feedback"
+      "title previewImage creatorInfo status feedback createdAt"
     )
       .populate("creatorInfo")
       .sort({ createdAt: -1 });
