@@ -37,14 +37,41 @@ router.get("/allRecipes", async (req, res) => {
       .json({ error: "Something went wrong", message: error.message });
   }
 });
+
+// router.get("/allRecipes/approved", async (req, res) => {
+//   try {
+//     const result = await Recipe.find(
+//       { status: "approved" },
+//       "recipeName creatorInfo recipeImages  ingredients prepTime cookTime status feedback createdAt"
+//     )
+//       .populate("creatorInfo")
+//       .sort({ createdAt: -1 });
+//     res.status(201).json(result);
+//   } catch (error) {
+//     res
+//       .status(401)
+//       .json({ error: "Something went wrong", message: error.message });
+//   }
+// });
+
 router.get("/allRecipes/approved", async (req, res) => {
+  const pageNumber = req.query.page || 1;
+  const dataPerPage = 2;
   try {
-    const result = await Recipe.find(
+    let query = Recipe.find(
       { status: "approved" },
       "recipeName creatorInfo recipeImages  ingredients prepTime cookTime status feedback createdAt"
-    )
-      .populate("creatorInfo")
-      .sort({ createdAt: -1 });
+    ).sort({ createdAt: -1 });
+
+    if (req.query.page) {
+      query = query
+        .populate("creatorInfo")
+        .skip((pageNumber - 1) * dataPerPage)
+        .limit(dataPerPage);
+    }
+
+    const result = await query.exec();
+
     res.status(201).json(result);
   } catch (error) {
     res
