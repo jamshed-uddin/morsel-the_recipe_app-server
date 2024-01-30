@@ -6,6 +6,7 @@ const Blog = require("../schema/blogSchema");
 const User = require("../schema/userSchema");
 const SavedItem = require("../schema/savedItemSchema");
 const errorResponse = require("../utils/errorResponse");
+const { verifyJwt, verifyAdmin } = require("../middlewares/verifyMids");
 
 // getting count of users, recipes and blogs
 const getDocumentCount = async (model, query = {}) => {
@@ -120,7 +121,7 @@ router.get("/isLikedAndSaved", async (req, res) => {
 });
 
 // dashboard overview
-router.get("/overviewStates", async (req, res) => {
+router.get("/overviewStates", verifyJwt, verifyAdmin, async (req, res) => {
   try {
     const [totalUsers, admins, creators] = await Promise.all([
       getDocumentCount(User),
@@ -211,24 +212,6 @@ router.get("/trendingQuickVoices", async (req, res) => {
   }
 });
 
-// const recentRecipes = recipes?.filter((recipe) => {
-//   const timeDifference = new Date() - new Date(recipe.createdAt);
-//   const differenceInDays = parseInt(timeDifference / (1000 * 60 * 60 * 24));
-
-//   return differenceInDays <= 7;
-// });
-
-// const sortedTrendingRecipes = recentRecipes?.sort(
-//   (a, b) => b.likedBy?.length - a.likedBy?.length
-// );
-
-// // filtering for quick and easy recipes
-// const filteredQuickRecipes = recipes?.filter((recipe) => {
-//   return recipe.ingredients.length <= 7 || recipe.prepTime.minutes <= 20;
-// });
-
-// search route
-
 router.get("/search", async (req, res) => {
   const searchQuery = req.query.q;
 
@@ -255,7 +238,7 @@ router.get("/search", async (req, res) => {
 router.post("/jwt", async (req, res) => {
   const email = req.body;
   const token = jwt.sign(email, process.env.JWT_TOKEN_SECRET, {
-    expiresIn: "30d",
+    expiresIn: "1d",
   });
 
   res.send({ token });

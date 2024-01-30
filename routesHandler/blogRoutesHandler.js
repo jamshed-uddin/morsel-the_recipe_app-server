@@ -4,9 +4,10 @@ const Blog = require("../schema/blogSchema");
 const User = require("../schema/userSchema");
 const SavedItem = require("../schema/savedItemSchema");
 const { createNotification } = require("./notificationHandler");
+const { verifyJwt, verifyAdmin } = require("../middlewares/verifyMids");
 
 //post/create a blog
-router.post("/createBlog", async (req, res) => {
+router.post("/createBlog", verifyJwt, async (req, res) => {
   try {
     const newBlog = new Blog(req.body);
     const savedBlog = await newBlog.save();
@@ -22,7 +23,7 @@ router.post("/createBlog", async (req, res) => {
 });
 
 //get all blog
-router.get("/allBlogs", async (req, res) => {
+router.get("/allBlogs", verifyJwt, verifyAdmin, async (req, res) => {
   try {
     const result = await Blog.find(
       {},
@@ -63,6 +64,7 @@ router.get("/allBlogs/approved", async (req, res) => {
   }
 });
 
+// user specific blogs
 router.get("/myBlogs", async (req, res) => {
   try {
     const userId = req.query.userId;
@@ -94,35 +96,41 @@ router.get("/singleBlog/:blogId", async (req, res) => {
 
 // update status (by admin)
 // we will check first if the the user updating the status is admin or not.
-router.patch("/updateBlogStatus/:adminEmail", async (req, res) => {
-  const adminEmail = req.params.adminEmail;
-  const { creatorEmail, blogId, status, feedback } = req.body;
-  try {
-    const currentUser = await User.findOne({ email: adminEmail });
-    if (currentUser.role !== "admin") {
-      return res.status(401).json({ error: "Unauthorized action" });
+router.patch(
+  "/updateBlogStatus/:adminEmail",
+  verifyJwt,
+  verifyAdmin,
+  async (req, res) => {
+    const adminEmail = req.params.adminEmail;
+    const { creatorEmail, blogId, status, feedback } = req.body;
+    try {
+      const currentUser = await User.findOne({ email: adminEmail });
+      if (currentUser.role !== "admin") {
+        return res.status(401).json({ error: "Unauthorized action" });
+      }
+
+      await Blog.updateOne({ _id: blogId }, { status, feedback });
+
+      if (status !== "pending") {
+        const savedNotification = await createNotification(
+          creatorEmail,
+          "blog",
+          blogId,
+          `Your blog has been ${status}.`
+        );
+      }
+
+      res.status(201).json({ message: "Blog status changed successfully" });
+    } catch (error) {
+      res
+        .status(401)
+        .json({ error: "Something went wrong", message: error.message });
     }
-
-    await Blog.updateOne({ _id: blogId }, { status, feedback });
-
-    if (status !== "pending") {
-      const savedNotification = await createNotification(
-        creatorEmail,
-        "blog",
-        blogId,
-        `Your blog has been ${status}.`
-      );
-    }
-
-    res.status(201).json({ message: "Blog status changed successfully" });
-  } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
   }
-});
+);
 
-router.put("/updateBlog/:userEmail", async (req, res) => {
+// updating blog by user
+router.put("/updateBlog/:userEmail", verifyJwt, async (req, res) => {
   const userEmail = req.params.userEmail;
   const updatedBlogBody = req.body;
   const { _id, creatorInfo } = updatedBlogBody;
@@ -156,7 +164,7 @@ router.put("/updateBlog/:userEmail", async (req, res) => {
   }
 });
 
-router.delete("/deleteBlog", async (req, res) => {
+router.delete("/deleteBlog", verifyJwt, async (req, res) => {
   const deletingBlogId = req.query.itemId;
   const currentUserEmail = req.query.userEmail;
   try {

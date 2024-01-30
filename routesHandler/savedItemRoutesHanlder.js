@@ -2,31 +2,19 @@ const express = require("express");
 const router = express.Router();
 const SavedItem = require("../schema/savedItemSchema");
 const mongoose = require("mongoose");
+const { verifyJwt } = require("../middlewares/verifyMids");
 
-router.get("/savedItems", async (req, res) => {
+router.get("/savedItems", verifyJwt, async (req, res) => {
   const userId = req.query.userId;
-  const itemType = req.query.itemType;
 
   //item type for filtering item with Recipe/Blog/All
 
   try {
-    if (itemType === "All") {
-      const savedItems = await SavedItem.find({ userId }).populate({
-        path: "item",
-        select:
-          "title previewImage creatorInfo recipeName recipeImages ingredients prepTime cookTime",
-      });
-      return res.status(201).json(savedItems);
-    }
-
-    const savedItems = await SavedItem.find({
-      $and: [{ userId }, { itemType }],
-    }).populate({
+    const savedItems = await SavedItem.find({ userId }).populate({
       path: "item",
       select:
         "title previewImage creatorInfo recipeName recipeImages ingredients prepTime cookTime",
     });
-    // const populatedItem = savedItem.populate("item");
     res.status(201).json(savedItems);
   } catch (error) {
     console.log(error);
