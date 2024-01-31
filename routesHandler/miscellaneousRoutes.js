@@ -5,6 +5,7 @@ const Recipe = require("../schema/recipeSchema");
 const Blog = require("../schema/blogSchema");
 const User = require("../schema/userSchema");
 const SavedItem = require("../schema/savedItemSchema");
+const Category = require("../schema/categorySchema");
 const errorResponse = require("../utils/errorResponse");
 const { verifyJwt, verifyAdmin } = require("../middlewares/verifyMids");
 
@@ -233,6 +234,46 @@ router.get("/search", async (req, res) => {
     errorResponse(res, error);
   }
 });
+
+router.get("/allCategories", async (req, res) => {
+  try {
+    const result = await Category.find({});
+    res.status(200).send(result);
+  } catch (error) {
+    errorResponse(res, error);
+  }
+});
+
+router.get("/categoryAndRecipe", async (req, res) => {
+  const categoryQuery = req.query.category;
+  try {
+    const category = await Category.findOne({ category: categoryQuery }).select(
+      "-photoURL"
+    );
+    const recipeOfCategory = await Recipe.find({
+      categories: { $in: categoryQuery },
+    }).select(
+      "recipeName creatorInfo recipeImages  ingredients prepTime cookTime"
+    );
+
+    console.log(recipeOfCategory);
+
+    res.status(200).send({ category, recipeOfCategory });
+  } catch (error) {
+    errorResponse(res, error);
+  }
+});
+
+// router.post("/addCategories", async (req, res) => {
+//   const body = req.body;
+
+//   try {
+//     await Category.insertMany(body);
+//     res.status(200).send({ message: "Data inserted" });
+//   } catch (error) {
+//     errorResponse(res, error);
+//   }
+// });
 
 // jwt
 router.post("/jwt", async (req, res) => {

@@ -131,7 +131,7 @@ router.delete("/deleteUser", verifyJwt, async (req, res) => {
     if (currentUser.email !== userEmail) {
       return res.status(401).json({ error: "Unauthorized action" });
     }
-    console.log(currentUser);
+
     await User.deleteOne({ _id: deletingUserId });
     await Recipe.deleteMany({ creatorInfo: deletingUserId });
     await Blog.deleteMany({ creatorInfo: deletingUserId });
