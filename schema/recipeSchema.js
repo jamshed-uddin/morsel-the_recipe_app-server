@@ -11,7 +11,7 @@ const recipeSchema = mongoose.Schema({
   prepTime: { hours: String, minutes: { type: String, required: true } },
   cookTime: { hours: String, minutes: String },
   tags: [],
-  categories: [],
+  categories: [{ type: String, default: "others" }],
   status: { type: String, default: "approved" },
   feedback: { type: String, default: "" },
   likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

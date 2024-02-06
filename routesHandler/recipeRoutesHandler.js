@@ -5,6 +5,7 @@ const User = require("../schema/userSchema");
 const SavedItem = require("../schema/savedItemSchema");
 const { createNotification } = require("./notificationHandler");
 const { verifyJwt, verifyAdmin } = require("../middlewares/verifyMids");
+const errorResponse = require("../utils/errorResponse");
 
 //post a recipe
 router.post("/createRecipe", verifyJwt, async (req, res) => {
@@ -16,9 +17,7 @@ router.post("/createRecipe", verifyJwt, async (req, res) => {
       id: savedRecipe._id,
     });
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
@@ -33,24 +32,30 @@ router.get("/allRecipes", verifyJwt, verifyAdmin, async (req, res) => {
       .sort({ createdAt: -1 });
     res.status(201).json(result);
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
 router.get("/allRecipes/approved", async (req, res) => {
+  const categoryQuery = req.query.category;
   const pageNumber = req.query.page || 1;
   const dataPerPage = 2;
+
   try {
+    const filter = { status: "approved" };
+
+    if (categoryQuery) {
+      filter.$and = [{ categories: { $in: categoryQuery } }];
+    }
+
     let query = Recipe.find(
-      { status: "approved" },
-      "recipeName creatorInfo recipeImages  ingredients prepTime cookTime status feedback createdAt"
+      filter,
+      "recipeName creatorInfo recipeImages  ingredients prepTime cookTime categories status feedback createdAt"
     ).sort({ createdAt: -1 });
 
     if (req.query.page) {
       query = query
-        .populate("creatorInfo")
+        .populate({ path: "creatorInfo", select: "name email photoURL" })
         .skip((pageNumber - 1) * dataPerPage)
         .limit(dataPerPage);
     }
@@ -59,9 +64,7 @@ router.get("/allRecipes/approved", async (req, res) => {
 
     res.status(201).json(result);
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
@@ -91,9 +94,7 @@ router.get("/singleRecipe/:recipeId", async (req, res) => {
     );
     res.status(201).json(result);
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
@@ -125,9 +126,7 @@ router.patch(
 
       res.status(201).json({ message: "Recipe status changed successfully" });
     } catch (error) {
-      res
-        .status(401)
-        .json({ error: "Something went wrong", message: error.message });
+      errorResponse(res, error);
     }
   }
 );
@@ -161,9 +160,7 @@ router.put("/updateRecipe/:userEmail", verifyJwt, async (req, res) => {
       id: updatedRecipe._id,
     });
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 
@@ -186,9 +183,7 @@ router.delete("/deleteRecipe", verifyJwt, async (req, res) => {
     await Recipe.deleteOne({ _id: deletingRecipeId });
     res.status(201).json({ message: "Recipe deleted successfully" });
   } catch (error) {
-    res
-      .status(401)
-      .json({ error: "Something went wrong", message: error.message });
+    errorResponse(res, error);
   }
 });
 

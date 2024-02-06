@@ -256,8 +256,6 @@ router.get("/categoryAndRecipe", async (req, res) => {
       "recipeName creatorInfo recipeImages  ingredients prepTime cookTime"
     );
 
-    console.log(recipeOfCategory);
-
     res.status(200).send({ category, recipeOfCategory });
   } catch (error) {
     errorResponse(res, error);
@@ -279,7 +277,7 @@ router.get("/categoryAndRecipe", async (req, res) => {
 router.post("/jwt", async (req, res) => {
   const email = req.body;
   const token = jwt.sign(email, process.env.JWT_TOKEN_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "30d",
   });
 
   res.send({ token });
